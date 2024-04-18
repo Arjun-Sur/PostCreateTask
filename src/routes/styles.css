@@ -1,0 +1,53 @@
+:root {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+p {
+    margin: 0;
+}
+
+.gradebook {
+    border-collapse: collapse;
+
+    th,
+    td {
+        border: 1px solid;
+        padding: 3px;
+    }
+}
+
+.assignment {
+    writing-mode: vertical-rl;
+    text-orientation: sideways;
+
+    .delete {
+        margin-bottom: 10px;
+    }
+}
+
+.student {
+    .delete {
+        margin-left: 10px;
+    }
+}
+
+.spacer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.studentPointsInput {
+    width: 50px;
+}
+
+.options {
+    vertical-align: top;
+
+    tbody {
+        vertical-align: top;
+    }
+
+    td {
+        padding: 0 15px;
+    }
+}
