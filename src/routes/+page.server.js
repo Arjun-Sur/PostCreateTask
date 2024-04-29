@@ -1,12 +1,12 @@
 import { redirect } from '@sveltejs/kit';
 
 export async function load({ locals }) {
-    // Access our user from locals.
+    // Access user from locals
     if (!locals.user) {
-        // If no user is logged in, redirect to the sign up page.
+        // If no user is signed in, redirect to the sign in page
         redirect(301, '/signin');
     }
 
-    // If the user is logged in, redirect to the account page.
+    // If the user is signed in, redirect to the gradebook page
     redirect(301, '/gradebook');
 }

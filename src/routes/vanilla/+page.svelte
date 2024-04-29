@@ -2,6 +2,8 @@
     <title>Demo | Gradebook</title>
 </svelte:head>
 
+<!-- This is just my old Create Task Code from Replit, which doesn't connect to any backend/database -->
+
 <script>
     import {onMount} from 'svelte';
     import {Alert, Card} from 'flowbite-svelte';

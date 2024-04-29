@@ -1,4 +1,4 @@
-// place files you want to import through the `$lib` alias in this folder.
+// Utility function that capitalizes the first letter of a string
 export function caseCorrectly(name) {
     return name.charAt(0).toUpperCase() + name.substring(1).toLowerCase();
 }

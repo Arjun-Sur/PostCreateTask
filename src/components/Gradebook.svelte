@@ -14,20 +14,25 @@
         TableHeadCell
     } from 'flowbite-svelte';
 
+    // Define the props for the component
     export let assignments, students, grades;
 
+    // Convert all grades to 1 decimal point
     Object.values(grades).forEach((studentGrades) => Object.entries(studentGrades).forEach(([assignmentId, grade]) => studentGrades[assignmentId] = (grade ? parseFloat(grade).toFixed(1) : parseInt(0).toFixed(1))));
 
+    // Array and updating for assignment categories
     let categoriesArr = [];
     $: categoriesArr = Object.values(assignments).map(assignment => assignment.category);
 
+    // Array and updating for assignment due dates
     let dueDateArr = [];
     $: dueDateArr = Object.values(assignments).map(assignment => assignment.due);
 
-    let totalPoints = 0;
+    // Array points and updating for assignment points
     let pointsArr = [];
     $: pointsArr = Object.values(assignments).map(assignment => assignment.points);
 
+    // Array and updating for overall categories
     let categoriesPointsArr = [];
     $: categoriesPointsArr = Object.values(assignments).reduce((acc, {
         category,
@@ -38,11 +43,14 @@
         return acc;
     }, {});
 
+    // Calculate total points
+    let totalPoints = 0;
     $: totalPoints = pointsArr.reduce((acc, curr) => acc + curr, 0);
 
     let averagesObj;
 
-    function calcAverages() {
+    // Updating totals, averages, and student categories
+    function calculateAveragesAndTotals() {
         averagesObj = {"Overall": []}; // Clears it
         Object.entries(assignments).forEach(([id]) => {
             averagesObj[id] = [];
@@ -70,12 +78,15 @@
         });
     }
 
-    $: grades && calcAverages();
+    // This runs calculateAveragesAndTotals() when grades change
+    $: grades && calculateAveragesAndTotals();
 
+    // Converts a grade percentage to a hsl color
     function percentToColor(grade) {
         return "hsl(" + grade.toString(10) + ",100%,50%)";
     }
 
+    // Converts a grade percentage to a letter grade
     function percentToLetterGrade(grade) {
         if (grade >= 90.0) return "A";
         else if (grade >= 80.0) return "B";
@@ -84,6 +95,7 @@
         else return "F";
     }
 
+    // Tracks changes to grades within the gradebook
     let changes = {};
     $: changes;
 </script>
@@ -91,8 +103,9 @@
 <section class="relative py-1 sm:py-1">
     <div class="px-4 mx-auto max-w-screen-xl lg:py-5 lg:px-6">
         <Card size="lg" class="mt-5 ml-auto mr-auto !max-w-6xl">
+            <!--Need these if true statements in order to declare the constants that are reused-->
             {#if true}
-
+                <!--Represents the categories and their total point values-->
                 {@const categories = Object.entries(Object.values(assignments).reduce((acc, {
                     category,
                     points
@@ -103,9 +116,11 @@
                         <TableHead>
                             <TableHeadCell>Student</TableHeadCell>
                             <TableHeadCell>Overall</TableHeadCell>
+                            <!-- Adds each assignment to the table header -->
                             {#each Object.entries(assignments) as [id, assignment], i}
                                 <TableHeadCell style="writing-mode: vertical-rl; text-orientation: sideways;">
                                     <div class="flex justify-between">
+                                        <!-- Single button within the form so the submit action can act as a form action -->
                                         <form id="removeAssignment" method="POST" action="?/removeAssignment">
                                             <Button type="submit" pill value="{id}" name="id" class="pl-0 pt-1 pb-1 pr-0 mb-[10px]">
                                                 X
@@ -115,7 +130,8 @@
                                     </div>
                                 </TableHeadCell>
                             {/each}
-                            {#each categories as [category, points]}
+                            <!-- Adds each category to the table header -->
+                            {#each categories as [category, ]}
                                 <TableHeadCell
                                         style="writing-mode: vertical-rl; text-orientation: sideways;">{category}</TableHeadCell>
                             {/each}
@@ -125,53 +141,58 @@
                             <TableBodyRow>
                                 <TableBodyCell><i>Category</i></TableBodyCell>
                                 <TableBodyCell></TableBodyCell>
+                                <!-- Adds each assignment category to the Category row -->
                                 {#each categoriesArr as category}
                                     <TableBodyCell>{category}</TableBodyCell>
-                                {/each}
-                                {#each categories as []}
-                                    <TableBodyCell></TableBodyCell>
                                 {/each}
                             </TableBodyRow>
                             <TableBodyRow>
                                 <TableBodyCell><i>Due Date</i></TableBodyCell>
                                 <TableBodyCell></TableBodyCell>
+                                <!-- Adds each assignment due date to the Due Date row -->
                                 {#each dueDateArr as date}
                                     <TableBodyCell>{date}</TableBodyCell>
-                                {/each}
-                                {#each categories as []}
-                                    <TableBodyCell></TableBodyCell>
                                 {/each}
                             </TableBodyRow>
                             <TableBodyRow>
                                 <TableBodyCell><i>Points</i></TableBodyCell>
                                 <TableBodyCell>{totalPoints}</TableBodyCell>
+                                <!-- Adds each assignment points to the Points row -->
                                 {#each pointsArr as points}
                                     <TableBodyCell>{points}</TableBodyCell>
                                 {/each}
+                                <!-- Adds each category points to the Points row -->
                                 {#each Object.values(categoriesPointsArr) as points}
                                     <TableBodyCell>{points}</TableBodyCell>
                                 {/each}
                             </TableBodyRow>
                             <TableBodyRow>
                                 {#if true}
+                                    <!-- Calculates the overall class average grade -->
                                     {@const overallAverage = ((averagesObj["Overall"].reduce((acc, curr) => acc + curr, 0) / averagesObj["Overall"].length)).toFixed(1)}
                                     <TableBodyCell><b>Average</b></TableBodyCell>
+                                    <!-- Adds the overall class average grade to the Average row -->
                                     <TableBodyCell style={`background-color: ${percentToColor(overallAverage)};`}
                                                    class="!text-gray-900">
                                         {overallAverage}% {percentToLetterGrade(overallAverage)}
                                     </TableBodyCell>
+                                    <!-- Adds the average grade for each assignment and category to the Average row -->
                                     {#each Object.entries(averagesObj).filter(([id]) => id !== "Overall") as [column, averages]}
                                         <TableBodyCell
                                                 key={column}>{(averages.reduce((acc, curr) => acc + curr, 0) / averages.length).toFixed(1)}</TableBodyCell>
                                     {/each}
                                 {/if}
                             </TableBodyRow>
+                            <!-- Adds each student as a row to the gradebook table -->
                             {#each Object.entries(students) as [studentId, student], i}
+                                <!-- Fetches the student's grades -->
                                 {@const studentAssignmentGrades = grades[studentId]}
                                 <TableBodyRow>
                                     <TableBodyCell>
+                                        <!-- Adds the student full name and delete button -->
                                         <div class="flex justify-between">
                                             <p>{student.lastName}, {student.firstName}</p>
+                                            <!-- Single button within the form so the submit action can act as a form action -->
                                             <form id="removeStudent" method="POST" action="?/removeStudent">
                                                 <Button type="submit" value="{studentId}" name="id"
                                                         class="pt-0 pl-1 pr-1 pb-0 ml-[10px]">X
@@ -180,26 +201,30 @@
                                         </div>
                                     </TableBodyCell>
                                     {#if true}
+                                        <!-- Calculates the overall student grade -->
                                         {@const overallStudent = (Math.round((Object.values(studentAssignmentGrades || {}).reduce((a, b) => a + parseFloat(b || 0), 0) / totalPoints) * 1000) / 10).toFixed(1)}
                                         <TableBodyCell style={`background-color: ${percentToColor(overallStudent)};`}
                                                        class="!text-gray-900">
                                             {overallStudent}% {percentToLetterGrade(overallStudent)}
                                         </TableBodyCell>
                                     {/if}
+                                    <!-- Adds each grade as an editable input-->
                                     {#each Object.entries(assignments) as [assignmentId, assignment]}
                                         <TableBodyCell>
                                             <Input type="number" min="0" pill
                                                    max="{assignment.points}" step="0.1" pattern="\d+(\.\d{1})?"
                                                    bind:value={grades[studentId][assignmentId]}
                                                    on:change={() => {
-                                       grades[studentId][assignmentId] = (parseFloat(grades[studentId][assignmentId]) || 0).toFixed(1);
-                                       if (!changes[studentId]) changes[studentId] = {};
+                                       grades[studentId][assignmentId] = (parseFloat(grades[studentId][assignmentId]) || 0).toFixed(1); // Formats the grade
+                                       if (!changes[studentId]) changes[studentId] = {}; // Adds the change to the changes object
                                        changes[studentId][assignmentId] = grades[studentId][assignmentId];
                                    }}
-                                                   on:keypress={(e) => (!/\.|\d/.test(e.key)) && e.preventDefault()}/>
+                                                   on:keypress={(e) => (!/\.|\d/.test(e.key)) && e.preventDefault()}/> <!-- Prevents non-numeric characters -->
                                         </TableBodyCell>
                                     {/each}
-                                    {#each categories as [category, points]}
+                                    <!-- Adds each student category total to the student's row -->
+                                    {#each categories as [category, ]}
+                                        <!-- Calculates the student's category total -->
                                         {@const categoryTotal = Object.keys(studentAssignmentGrades).reduce((acc, curr) => {
                                             if (assignments[curr].category === category) acc += parseFloat(studentAssignmentGrades[curr] || 0);
                                             return acc;
@@ -211,7 +236,9 @@
                         </TableBody>
                     </Table>
 
+                    <!-- Shows button only if there are changes -->
                     {#if Object.entries(changes).length > 0}
+                        <!-- Form submits with changes object as a hidden input so it can use form actions -->
                         <form id="saveGrades" method="POST" action="?/saveGrades" class="text-right z-100">
                             <input name="grades" value={JSON.stringify(changes)} style="display: none"/>
                             <Button type="submit">Save Grades</Button>
@@ -222,6 +249,7 @@
         </Card>
         <div class="flex gap-3 pt-3 ml-auto mr-auto max-w-6xl">
             <Card size="lg">
+                <!-- Add student form using form actions -->
                 <form id="addStudent" method="POST" action="?/addStudent">
                     <h5 class="mb-2 text-2xl font-semibold tracking-tight text-white">Add Student</h5>
                     <div class="mb-6">
@@ -236,6 +264,7 @@
                 </form>
             </Card>
             <Card size="lg">
+                <!-- Add assignment form using form actions -->
                 <form id="addAssignment" method="POST" action="?/addAssignment">
                     <h5 class="mb-2 text-2xl font-semibold tracking-tight text-white">Add Assignment</h5>
                     <div class="mb-6">
@@ -261,6 +290,8 @@
 
         <div class="flex gap-3 pt-3 ml-auto mr-auto max-w-6xl">
             <Card size="lg" class="">
+                <!-- Reset button that replaces everything in the database with this data -->
+                <!-- Form with empty input -->
                 <form id="reset" method="POST" action="?/reset" class="text-center">
                     <input name="gradebook" value={JSON.stringify({
                             students: [{first: "Garfield", last: "Bryner"}, {first: "John", last: "Doe"}, {first: "Billy", last: "Bob"}, {first: "Sally", last: "Sue"}, {first: "Tom", last: "Jerry"}, {first: "Mickey", last: "Mouse"}, {first: "Donald", last: "Duck"}, {first: "Minnie", last: "Mouse"}, {first: "Philip", last: "Walters"}],
@@ -270,8 +301,9 @@
                 </form>
             </Card>
             <Card size="lg">
+                <!-- Displays the amount of changes that have been made to the grades in the gradebook -->
                 <P>Grade
-                    Changes: {Object.values(changes).reduce((prev, cur, index) => prev += Object.keys(cur).length, 0)}
+                    Changes: {Object.values(changes).reduce((prev, cur) => prev += Object.keys(cur).length, 0)}
                     change(s)</P>
             </Card>
         </div>

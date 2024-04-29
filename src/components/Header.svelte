@@ -14,17 +14,20 @@
     } from 'flowbite-svelte';
     import {page} from '$app/stores';
 
+    // Get page data this way because this is a component and not a page
     let {data} = $page;
 
+    // Get account from page data
     let {account} = data;
 </script>
 
+<!--Navbar Component-->
 <Navbar let:hidden let:toggle class="z-10">
-    <NavBrand href="/">
+    <NavBrand>
         <span class="self-center whitespace-nowrap text-xl font-semibold dark:text-white">Gradebook</span>
     </NavBrand>
     <div class="flex items-center md:order-2">
-
+        <!-- If the user is signed in -->
         {#if data?.account}
             <div>
                 <Avatar/>

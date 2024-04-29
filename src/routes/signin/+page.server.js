@@ -1,18 +1,27 @@
 import {createAdminClient, SESSION_COOKIE} from "$lib/server/appwrite.js";
 import {redirect} from "@sveltejs/kit";
 
+export async function load({locals}) {
+    // Access user from locals
+    if (locals.user) {
+        // If the user is signed in, redirect to the gradebook page
+        redirect(301, '/gradebook');
+    }
+}
+
+
 export const actions = {
     signin: async ({request, cookies}) => {
-        // Extract the form data.
+        // Extract the form data
         const form = await request.formData();
+
         const email = form.get("email");
         const password = form.get("password");
 
-        // Create the Appwrite client.
+        // Create the Appwrite client
         const {account} = createAdminClient();
 
-        // Create the session using the client
-        // await account.create(ID.unique(), email, password, name);
+        // Create the session using the email and password
         const session = account.createEmailPasswordSession(email, password);
 
         await session.then(function (response) {
@@ -27,7 +36,7 @@ export const actions = {
                 path: "/",
             });
 
-            // Redirect to the account page.
+            // Redirect to the gradebook page
             redirect(301, "/gradebook");
         }, function (error) {
             console.log(error); // Failure
