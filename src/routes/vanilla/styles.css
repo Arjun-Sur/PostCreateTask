@@ -37,7 +37,7 @@ p {
 }
 
 .studentPointsInput {
-    width: 50px;
+    width: 80px !important;
 }
 
 .options {
