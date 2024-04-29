@@ -51,7 +51,7 @@ export async function load({locals}) {
         const students = await getStudents();
 
         async function getGrades() {
-            const grades = await database.listDocuments("gradebook", "grades");
+            const grades = await database.listDocuments("gradebook", "grades", [Query.limit(100)]);
             const gradesObj = {};
 
             Object.entries(students).forEach(([studentId, student]) => {
