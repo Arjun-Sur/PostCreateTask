@@ -57,7 +57,7 @@ export async function load({locals}) {
         const grades = await database.listDocuments(GRADEBOOK_DATABASE_ID, GRADES_COLLECTION_ID, [Query.limit(100)]);
         const gradesObj = {};
 
-        Object.entries(students).forEach(([studentId, student]) => {
+        Object.entries(students).forEach(([studentId, ]) => {
             gradesObj[studentId] = {};
 
             Object.entries(assignments).forEach(([assignmentId, {points}]) => {

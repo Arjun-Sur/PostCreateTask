@@ -1,6 +1,7 @@
 <script lang="ts">
     import {
-        Avatar, Button,
+        Avatar,
+        Button,
         Dropdown,
         DropdownDivider,
         DropdownHeader,
@@ -9,8 +10,7 @@
         NavBrand,
         NavHamburger,
         NavLi,
-        NavUl,
-        P
+        NavUl
     } from 'flowbite-svelte';
     import {page} from '$app/stores';
 

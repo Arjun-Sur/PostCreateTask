@@ -55,7 +55,7 @@
         Object.entries(assignments).forEach(([id]) => {
             averagesObj[id] = [];
         });
-        Object.entries(grades).forEach(([studentId, studentGrades]) => {
+        Object.entries(grades).forEach(([, studentGrades]) => {
             Object.entries(studentGrades).forEach(([id, grade]) => {
                 averagesObj[id].push(parseFloat(grade || 0))
             });
